@@ -1,14 +1,8 @@
 import cors from "cors";
 import express from "express";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
-// import { db } from "./firebase-config.js";
+
+import NewUser from "./routes/NewUser.js";
+import Login from "./routes/Login.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -16,7 +10,10 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cors());
 
+app.use("/NewUser", NewUser);
 
-app.listen(PORT,()=>{
-    console.log(`listening on port ${PORT}`)
-})
+app.use("/Login", Login);
+
+app.listen(PORT, () => {
+  console.log(`listening on port ${PORT}`);
+});
