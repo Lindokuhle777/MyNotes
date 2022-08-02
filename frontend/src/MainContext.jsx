@@ -10,21 +10,26 @@ import { auth } from "./firebase";
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
 
   const googleSignIn = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider);
   };
 
-  const logOut =async () => {
+  const logOut = async () => {
     await signOut(auth);
   };
 
   useEffect(() => {
     const subscribe = onAuthStateChanged(auth, (currUser) => {
-      setUser({ email: currUser.email, name: currUser.displayName });
-      console.log({ email: currUser.email, name: currUser.displayName });
+      if (user === null) {
+        if (currUser === null) {
+          setUser(currUser);
+        } else {
+          setUser({ email: currUser.email, name: currUser.displayName });
+        }
+      }
     });
     return () => {
       subscribe();
@@ -37,7 +42,3 @@ export const AuthContextProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-// export const UserAuth = () => {
-//   return useContext(AuthContext);
-// };

@@ -6,13 +6,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { LoginContext } from "./LoginContext";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as YUP from "yup";
 import axios from "axios";
 import NewAccount from "./NewAccount";
 import { AuthContext } from "../../MainContext";
+import { useNavigate } from "react-router-dom";
 
 const mainDiv = {
   position: "absolute",
@@ -45,10 +46,13 @@ const paperStyle = {
 };
 
 function RightPanel() {
-  const { user, setMessage, setOpen } = useContext(LoginContext);
+  const { setMessage, setOpen } = useContext(LoginContext);
+
   const [signUp, setSignUp] = useState(false);
 
-  const { googleSignIn } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const { googleSignIn, setUser, user } = useContext(AuthContext);
 
   const initialValues = {
     email: "",
@@ -62,10 +66,12 @@ function RightPanel() {
     };
 
     await axios.post("http://localhost:5000/Login", data).then((res) => {
-      if (res.data === "correct") {
+      if (res.data.message === "correct") {
         // all good, move to the next page
-        setMessage("All good");
-        setOpen(true);
+
+        setUser({ email: data.email, name: res.data.name });
+        navigate("Home");
+
         props.resetForm();
       } else if (res.data === "incorrect password") {
         setMessage("Incorrect password");
@@ -96,6 +102,12 @@ function RightPanel() {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    if (user !== null) {
+      navigate("Home");
+    }
+  }, [user]);
 
   return (
     <div style={mainDiv}>
@@ -155,7 +167,12 @@ function RightPanel() {
           </Formik>
           <div>
             <Typography variant="overline">Don't have an account?</Typography>
-            <Button variant="text" style={{color:"#115571"}} size="small" onClick={handleNewAccount}>
+            <Button
+              variant="text"
+              style={{ color: "#115571" }}
+              size="small"
+              onClick={handleNewAccount}
+            >
               Sign in
             </Button>
           </div>

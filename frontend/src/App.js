@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./components/Login/Login";
 import { AuthContextProvider } from "./MainContext";
 import HomePage from "./components/Home/HomePage";
+import Protected from "./Protected";
 
 function App() {
   return (
@@ -11,7 +12,14 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" exact element={<Login />} />
-            <Route path="/Home" element={<HomePage />} />
+            <Route
+              path="/Home"
+              element={
+                <Protected>
+                  <HomePage />
+                </Protected>
+              }
+            />
           </Routes>
         </BrowserRouter>
       </AuthContextProvider>
