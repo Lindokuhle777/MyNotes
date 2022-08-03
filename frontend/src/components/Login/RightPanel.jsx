@@ -69,7 +69,7 @@ function RightPanel() {
       if (res.data.message === "correct") {
         // all good, move to the next page
 
-        setUser({ email: data.email, name: res.data.name });
+        setUser({ email: data.email, name: res.data.name,id:res.data.id });
         navigate("Home");
 
         props.resetForm();

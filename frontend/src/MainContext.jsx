@@ -19,6 +19,7 @@ export const AuthContextProvider = ({ children }) => {
 
   const logOut = async () => {
     await signOut(auth);
+    setUser(null)
   };
 
   useEffect(() => {
@@ -27,7 +28,8 @@ export const AuthContextProvider = ({ children }) => {
         if (currUser === null) {
           setUser(currUser);
         } else {
-          setUser({ email: currUser.email, name: currUser.displayName });
+          console.log(currUser.uid)
+          setUser({ email: currUser.email, name: currUser.displayName,id:currUser.uid});
         }
       }
     });

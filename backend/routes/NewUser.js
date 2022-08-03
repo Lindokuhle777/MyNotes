@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 const app = express();
 import { db } from "../firebase.js";
+import {uid} from "uid";
 
 const router = express.Router();
 
@@ -27,8 +28,9 @@ router.post("/", async(req,res) => {
     if(userDoc.exists()) {
         res.send("exists")
     }else{
+        const uuid = uid(20);
         let data = {
-            email,name,password
+            email,name,password,id:uuid
         }
 
         await setDoc(docRef, data);

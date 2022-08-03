@@ -27,7 +27,7 @@ router.post("/",async (req,res) => {
         const data = userDoc.data();
         
         if(data.email === email && data.password === password) {
-            res.send({message:"correct",name:data.name});
+            res.send({message:"correct",name:data.name,id:data.id});
         }else{
             res.send("incorrect password");
         }

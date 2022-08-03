@@ -1,5 +1,5 @@
-import { Button, Divider, Typography } from "@mui/material";
-import React from "react";
+import { Button, Divider, Paper, TextField, Typography } from "@mui/material";
+import React, { useContext } from "react";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
@@ -10,6 +10,13 @@ import Box from "@mui/material/Box";
 import FolderIcon from "@mui/icons-material/Folder";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
+import { AuthContext } from "../../MainContext";
+import { HomeContext } from "./HomeContext";
+import { uid } from "uid";
+import { db } from "../../firebase";
+import { set, ref } from "firebase/database";
+import { Popper } from "@mui/material";
+import Fade from "@mui/material/Fade";
 
 const mainDiv = {
   position: "fixed",
@@ -29,12 +36,48 @@ const btnSty = {
 };
 
 function Leftpanel() {
+  const { user } = useContext(AuthContext);
+  const { collections, setCollections, setCurrCollection } =
+    useContext(HomeContext);
+  const [open, setOpen] = React.useState(false);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+    setOpen(true);
+  };
+
+  const canBeOpen = open && Boolean(anchorEl);
+  const id = canBeOpen ? "transition-popper" : undefined;
+
+  const handleNewCollection = async (event) => {
+    event.preventDefault();
+    const temp = document.getElementById("collectionName").value;
+
+    if (temp !== "") {
+      const uuid = uid();
+      const data = {
+        id:collections.length,
+        uuid:uuid,
+        name:temp,
+        collection:[]
+      }
+      await set(ref(db,user.id),data);
+    }
+    setOpen(false);
+  };
   return (
     <div style={mainDiv}>
       <Typography variant="h4" style={{ color: "white" }}>
         Collections
       </Typography>
-      <Button size="large" variant="filled" style={btnSty}>
+      <Button
+        size="large"
+        variant="filled"
+        style={btnSty}
+        onClick={handleClick}
+      >
         New Collection
       </Button>
       <div>
@@ -44,26 +87,18 @@ function Leftpanel() {
             maxHeight: "350px",
             overflowY: "auto",
             margin: "10% 5%",
-            borderRadius: "10px"
+            borderRadius: "10px",
           }}
         >
-          {[
-            "one",
-            "two",
-            "three",
-            "four",
-            "five",
-            "six",
-            "seven",
-            "eight",
-            "nine",
-            "eleven",
-          ].map((item, index) => (
-            <div>
+          {collections.map((item, index) => (
+            <div key={item}>
               <ListItem
-                key={item}
                 button
-                style={{ backgroundColor: "white",borderRadius: "10px",marginBottom: "5px"}}
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "10px",
+                  marginBottom: "5px",
+                }}
                 secondaryAction={
                   <IconButton edge="end" aria-label="delete">
                     <DeleteIcon />
@@ -81,6 +116,25 @@ function Leftpanel() {
           ))}
         </List>
       </div>
+      <Popper id={id} open={open} anchorEl={anchorEl} transition>
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <Paper
+              style={{ padding: "10px", display: "flex", flexDirection: "row" }}
+            >
+              <TextField
+                variant="standard"
+                placeholder="Collection Name"
+                id="collectionName"
+                size="small"
+              />
+              <Button size="small" onClick={handleNewCollection}>
+                Save
+              </Button>
+            </Paper>
+          </Fade>
+        )}
+      </Popper>
     </div>
   );
 }
