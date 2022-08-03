@@ -14,7 +14,7 @@ import { AuthContext } from "../../MainContext";
 import { HomeContext } from "./HomeContext";
 import { uid } from "uid";
 import { db } from "../../firebase";
-import { set, ref } from "firebase/database";
+import { set, ref, update, get } from "firebase/database";
 import { Popper } from "@mui/material";
 import Fade from "@mui/material/Fade";
 
@@ -51,19 +51,30 @@ function Leftpanel() {
   const canBeOpen = open && Boolean(anchorEl);
   const id = canBeOpen ? "transition-popper" : undefined;
 
+  const handleCurrCollection =(event)=> {
+    event.preventDefault();
+
+  }
+
   const handleNewCollection = async (event) => {
     event.preventDefault();
     const temp = document.getElementById("collectionName").value;
 
     if (temp !== "") {
       const uuid = uid();
-      const data = {
-        id:collections.length,
-        uuid:uuid,
-        name:temp,
-        collection:[]
+      if (collections.length === 0) {
+        const data = {
+          collections: [{ uuid, name: temp }],
+        };
+        await set(ref(db, user.id), data);
+      }else{
+        const data = await get(ref(db, user.id))
+        const newCol = {
+          uuid,name:temp
+        }
+
+        await update(ref(db, user.id), {collections:[...data.val().collections,newCol]})
       }
-      await set(ref(db,user.id),data);
     }
     setOpen(false);
   };
@@ -91,8 +102,12 @@ function Leftpanel() {
           }}
         >
           {collections.map((item, index) => (
-            <div key={item}>
+            <div key={item.uuid}>
               <ListItem
+                onClick={(event)=>{
+                  event.preventDefault();
+                  setCurrCollection(item);
+                }}
                 button
                 style={{
                   backgroundColor: "white",
@@ -110,7 +125,7 @@ function Leftpanel() {
                     <FolderIcon />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={item} secondary={item} />
+                <ListItemText primary={item.name} />
               </ListItem>
             </div>
           ))}

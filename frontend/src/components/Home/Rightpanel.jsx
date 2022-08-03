@@ -17,12 +17,17 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { HomeContext } from "./HomeContext";
+import { AuthContext } from "../../MainContext";
+import { uid } from "uid";
+import { db } from "../../firebase";
+import { set, ref, update, get } from "firebase/database";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -55,7 +60,7 @@ const paperStyle = {
   padding: "10px",
   maxWidth: "60%",
   maxHeight: "60%",
-  resize:"both",
+  resize: "both",
   justifyContent: "center",
 };
 
@@ -103,10 +108,13 @@ const dummyNotes = [
 function Rightpanel() {
   const [open, setOpen] = useState(false);
   const [statement, setStatement] = useState(true);
-  const [notes, setNotes] = useState(dummyNotes);
+  const [notes, setNotes] = useState([]);
   const [currSlide, setCurrSlide] = useState(
     notes.length > 0 ? notes[0] : null
   );
+
+  const { currCollection } = useContext(HomeContext);
+  const { user } = useContext(AuthContext);
 
   const toogle = () => {
     setStatement(!statement);
@@ -116,21 +124,71 @@ function Rightpanel() {
     setOpen(true);
   };
 
+  useEffect(() => {
+    setNotes([])
+    if (currCollection !== null){
+      if (currCollection.notes !== undefined || currCollection.notes) {
+        console.log(currCollection.notes);
+        setNotes(currCollection.notes);
+        setCurrSlide(currCollection.notes[0])
+        
+      }}
+    // currCollection.notes !== undefined && 
+  }, [currCollection,notes]);
+
+  // useEffect(()=>{
+  //   if(notes.length > 0)setCurrSlide(notes[notes.length - 1]);
+    
+
+
+  // },[notes])
+
+  
+
   const handleClose = () => {
-    document.getElementById("textArea").value = "";
-    document.getElementById("term").value = "";
     setOpen(false);
   };
 
-  const handleAdd = () => {
+  const addNote = async (note) => {
+    const data = await get(ref(db, user.id));
+    const temp = data.val().collections;
+    // console.log(temp);
+    let some = [];
+    for (let i = 0; i < temp.length; i++) {
+      const curr = temp[i];
+      // console.log(currCollection)
+      if (curr.uuid === currCollection.uuid) {
+        // console.log(curr)
+        if (curr.notes === undefined) {
+          some.push({ ...curr, notes: [note] });
+        } else {
+          some.push({ ...curr, notes: [...curr.notes, note] });
+        }
+      } else {
+        some.push(curr);
+      }
+    }
+    // console.log(some);
+    await update(ref(db, user.id), { collections: some });
+  };
+
+  useEffect(() => {});
+
+  const handleAdd = (event) => {
+    event.preventDefault();
     if (statement) {
       const temp = document.getElementById("textArea").value;
       if (temp !== "") {
-        console.log(temp);
-        setNotes({
+        const note = {
+          index: notes.length,
           type: "statement",
           statement: temp,
-        });
+        };
+        setCurrSlide(note)
+        setNotes(note);
+        addNote(note);
+        
+        document.getElementById("textArea").value = "";
         handleClose();
       }
     } else {
@@ -138,13 +196,19 @@ function Rightpanel() {
       const temp2 = document.getElementById("term").value;
 
       if (temp1 !== "" && temp2 !== "") {
-        console.log(temp1);
-        console.log(temp2);
-        setNotes({
+        console.log(notes);
+        const note = {
+          index: notes.length,
           type: "defination",
           statement: temp1,
           term: temp2,
-        });
+        };
+        setCurrSlide(note)
+        setNotes(note);
+        addNote(note);
+        
+        document.getElementById("textArea").value = "";
+        document.getElementById("term").value = "";
         handleClose();
       }
     }
@@ -164,6 +228,7 @@ function Rightpanel() {
         break;
 
       case "next":
+        // console.log(currSlide.index !== notes.length - 1)
         if (currSlide.index !== notes.length - 1) {
           setCurrSlide(notes[currSlide.index + 1]);
         }
@@ -193,10 +258,14 @@ function Rightpanel() {
                 {currSlide.term}
               </Typography>
             )}
-            <div style={{overflowY: "auto",maxHeight:"80%",textAlign:"center"}}>
-              <Typography variant="h5" >
-                {currSlide.statement}
-              </Typography>
+            <div
+              style={{
+                overflowY: "auto",
+                maxHeight: "80%",
+                textAlign: "center",
+              }}
+            >
+              <Typography variant="h5">{currSlide.statement}</Typography>
             </div>
 
             <div style={navIcons}>
@@ -244,7 +313,6 @@ function Rightpanel() {
                 </IconButton>
               </Tooltip>
             </div>
-
           </Paper>
         </>
       ) : (
@@ -258,7 +326,6 @@ function Rightpanel() {
       </Fab>
 
       <Dialog
-        style={{}}
         open={open}
         TransitionComponent={Transition}
         keepMounted

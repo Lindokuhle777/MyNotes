@@ -29,6 +29,8 @@ function HomePage() {
     setOpenMenu(false);
   };
 
+
+
   const handleClickOpen = () => {
     setOpenMenu(true);
   };
@@ -42,12 +44,15 @@ function HomePage() {
     }
   };
 
-  // useEffect(() => {
-  //   onValue(ref(db,user.id),snapshot=>{
-  //     console.log(snapshot);
-
-  //   })
-  // },[])
+  useEffect(() => {
+    onValue(ref(db,user.id),snapshot=>{
+      const data = snapshot.val();
+      if(data !== null && data.collections !== undefined) {
+        setCollections(data.collections);
+      }
+    })
+    
+  },[]);
 
   return (
     <div>
