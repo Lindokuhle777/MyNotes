@@ -39,15 +39,9 @@ const navIcons = {
   bottom: "5px",
 };
 
-const mainDiv = {
-  position: "absolute",
-  width: "80%",
-  left: "20%",
-  right: 0,
-  top: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0,0,0,0.01)",
-};
+const testareaStyle = {
+  marginTop: "10px"
+}
 
 const paperStyle = {
   position: "absolute",
@@ -61,11 +55,11 @@ const paperStyle = {
   maxWidth: "60%",
   maxHeight: "60%",
   resize: "both",
-  justifyContent: "center",
-  display: "flex",
-  alignItems: "center",
-  verticalAlign: "middle",
-  flexDirection: "column"
+  // justifyContent: "center",
+  // display: "flex",
+  // alignItems: "center",
+  // verticalAlign: "middle",
+  // flexDirection: "column"
 };
 
 const fabStyle = {
@@ -118,7 +112,17 @@ function Rightpanel() {
   );
 
   const { currCollection } = useContext(HomeContext);
-  const { user } = useContext(AuthContext);
+  const { user,desktop } = useContext(AuthContext);
+
+  const mainDiv = {
+    position: "absolute",
+    width: desktop? "80%":"100%",
+    left: desktop? "20%":0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.01)",
+  };
 
   const toogle = () => {
     setStatement(!statement);
@@ -149,8 +153,6 @@ function Rightpanel() {
 
   const addNote = async (note) => {
     const uuid = uid();
-
-    // console.log( { id: uuid, note })
 
     await axios
       .post("http://localhost:5000/Notes/addNotes", {
@@ -332,6 +334,7 @@ function Rightpanel() {
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
+        
       >
         <DialogTitle>{"New Card"}</DialogTitle>
         <DialogContent style={{ display: "flex", flexDirection: "column" }}>
@@ -360,7 +363,7 @@ function Rightpanel() {
             minRows={3}
             maxRows={6}
             placeholder={statement ? "Statement" : "Defination"}
-            style={{ marginTop: "5%", width: `${window.innerWidth * 0.2}px` }}
+            style={testareaStyle}
           />
         </DialogContent>
         <DialogActions>

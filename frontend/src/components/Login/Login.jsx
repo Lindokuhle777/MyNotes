@@ -7,12 +7,13 @@ import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { AuthContext } from "../../MainContext";
 
 function Login() {
   const [user, setUser] = useState("sabelo");
-  const matches = useMediaQuery("(min-width:400px)");
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
+  const {desktop} = useContext(AuthContext);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -38,7 +39,7 @@ function Login() {
   return (
     <LoginContext.Provider value={{ user, handleClose, setOpen, setMessage }}>
       <div style={{ display: "flex", flexDirection: "row" }}>
-        <LeftPanel />
+        {desktop && <LeftPanel />}
         <RightPanel />
         <Snackbar
           open={open}

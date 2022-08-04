@@ -4,10 +4,12 @@ import Login from "./components/Login/Login";
 import { AuthContextProvider } from "./MainContext";
 import HomePage from "./components/Home/HomePage";
 import Protected from "./Protected";
+import Test from "./Test";
 
 function App() {
   return (
-    <div>
+    <div >
+      
       <AuthContextProvider>
         <BrowserRouter>
           <Routes>

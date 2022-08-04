@@ -2,20 +2,23 @@ import React, { useContext, createContext, useEffect, useState } from "react";
 import {
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "./firebase";
+import useMediaQuery from '@mui/material/useMediaQuery';
 import axios from "axios";
 
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const desktop = useMediaQuery('(min-width:600px)');
 
   const googleSignIn = async () => {
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider);
+    desktop ? signInWithPopup(auth, provider):signInWithRedirect(auth, provider);
   };
 
   const logOut = async () => {
@@ -52,7 +55,7 @@ export const AuthContextProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ googleSignIn, user, logOut, setUser }}>
+    <AuthContext.Provider value={{ googleSignIn, user, logOut, setUser,desktop }}>
       {children}
     </AuthContext.Provider>
   );

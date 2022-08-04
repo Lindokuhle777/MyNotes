@@ -1,27 +1,27 @@
-import { Button, Divider, Paper, TextField, Typography } from "@mui/material";
-import React, { useContext } from "react";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Avatar from "@mui/material/Avatar";
+import React,{ useContext} from "react";
 import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import Button from "@mui/material/Button";
+import List from "@mui/material/List";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
 import FolderIcon from "@mui/icons-material/Folder";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
-import { AuthContext } from "../../MainContext";
-import { HomeContext } from "./HomeContext";
-import { uid } from "uid";
-import { db } from "../../firebase";
-import { set, ref, update, get } from "firebase/database";
+import Divider from "@mui/material/Divider";
 import { Popper } from "@mui/material";
 import Fade from "@mui/material/Fade";
+import { uid } from "uid";
+import { Paper, TextField, Typography } from "@mui/material";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import {HomeContext} from "./HomeContext";
+import { AuthContext } from "../../MainContext";
 import axios from "axios";
 
 const mainDiv = {
   position: "fixed",
-  width: "20%",
+  width: "80%",
   left: 0,
   right: 0,
   top: 0,
@@ -36,11 +36,11 @@ const btnSty = {
   color: "#31AFB4",
 };
 
-function Leftpanel() {
+export default function TemporaryDrawer() {
+  const {openDrawer,handleCloseDrawer,collections, setCollections, setCurrCollection,getCollections} = React.useContext(HomeContext);
   const { user } = useContext(AuthContext);
-  const { collections, setCollections, setCurrCollection,getCollections } =
-    useContext(HomeContext);
   const [open, setOpen] = React.useState(false);
+  const anchor = "left";
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -74,9 +74,17 @@ function Leftpanel() {
     }
     setOpen(false);
   };
+  
+
   return (
-    
-    <div style={mainDiv}>
+    <div>
+      <React.Fragment>
+        <Drawer
+          anchor={anchor}
+          open={openDrawer}
+          onClose={handleCloseDrawer}
+        >
+          <div style={mainDiv}>
       <Typography variant="h4" style={{ color: "white" }}>
         Collections
       </Typography>
@@ -148,7 +156,8 @@ function Leftpanel() {
         )}
       </Popper>
     </div>
+        </Drawer>
+      </React.Fragment>
+    </div>
   );
 }
-
-export default Leftpanel;

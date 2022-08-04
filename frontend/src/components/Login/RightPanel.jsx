@@ -15,16 +15,6 @@ import NewAccount from "./NewAccount";
 import { AuthContext } from "../../MainContext";
 import { useNavigate } from "react-router-dom";
 
-const mainDiv = {
-  position: "absolute",
-  width: "40%",
-  left: "60%",
-  right: 0,
-  top: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0,0,0,0.1)",
-};
-
 const btnStyle = {
   marginLeft: "10%",
   marginRight: "10%",
@@ -34,15 +24,26 @@ const fieldStyles = {
   marginTop: "3%",
 };
 
-const paperStyle = {
+const imgStyle = {
   position: "absolute",
-  left: "20%",
-  right: "20%",
-  top: "20%",
-  bottom: "10%",
+  left: 0,
+  right: 0,
+  top: "5%",
+
+  margin: "auto",
+};
+
+const paperStyle = {
+  width: "70%",
+  margin: "0",
   textAlign: "center",
   display: "flex",
   flexDirection: "column",
+  paddingBottom: "30px",
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%,-50%)",
 };
 
 function RightPanel() {
@@ -52,7 +53,18 @@ function RightPanel() {
 
   const navigate = useNavigate();
 
-  const { googleSignIn, setUser, user } = useContext(AuthContext);
+  const { googleSignIn, setUser, user, desktop } = useContext(AuthContext);
+
+  const mainDiv = {
+    position: "absolute",
+    width: desktop ? "40%" : "100%",
+    left: desktop ? "60%" : 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.1)",
+    backgroundImage: !desktop?`url(logo2.png)`:"none",
+  };
 
   const initialValues = {
     email: "",
@@ -69,7 +81,7 @@ function RightPanel() {
       if (res.data.message === "correct") {
         // all good, move to the next page
 
-        setUser({ email: data.email, name: res.data.name,id:res.data.id });
+        setUser({ email: data.email, name: res.data.name, id: res.data.id });
         navigate("Home");
 
         props.resetForm();
@@ -111,6 +123,7 @@ function RightPanel() {
 
   return (
     <div style={mainDiv}>
+      
       {signUp ? (
         <NewAccount handleNewAccount={handleNewAccount} />
       ) : (
