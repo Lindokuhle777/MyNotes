@@ -27,7 +27,7 @@ import { HomeContext } from "./HomeContext";
 import { AuthContext } from "../../MainContext";
 import { uid } from "uid";
 import { db } from "../../firebase";
-import { set, ref, update, get } from "firebase/database";
+import axios from "axios";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -62,6 +62,10 @@ const paperStyle = {
   maxHeight: "60%",
   resize: "both",
   justifyContent: "center",
+  display: "flex",
+  alignItems: "center",
+  verticalAlign: "middle",
+  flexDirection: "column"
 };
 
 const fabStyle = {
@@ -124,55 +128,51 @@ function Rightpanel() {
     setOpen(true);
   };
 
-  useEffect(() => {
-    setNotes([])
-    if (currCollection !== null){
-      if (currCollection.notes !== undefined || currCollection.notes) {
-        console.log(currCollection.notes);
-        setNotes(currCollection.notes);
-        setCurrSlide(currCollection.notes[0])
-        
-      }}
-    // currCollection.notes !== undefined && 
-  }, [currCollection,notes]);
-
-  // useEffect(()=>{
-  //   if(notes.length > 0)setCurrSlide(notes[notes.length - 1]);
-    
-
-
-  // },[notes])
-
-  
-
   const handleClose = () => {
     setOpen(false);
   };
 
-  const addNote = async (note) => {
-    const data = await get(ref(db, user.id));
-    const temp = data.val().collections;
-    // console.log(temp);
-    let some = [];
-    for (let i = 0; i < temp.length; i++) {
-      const curr = temp[i];
-      // console.log(currCollection)
-      if (curr.uuid === currCollection.uuid) {
-        // console.log(curr)
-        if (curr.notes === undefined) {
-          some.push({ ...curr, notes: [note] });
+  const getNotes = async (indicator) => {
+    await axios
+      .post("http://localhost:5000/Notes/getNotes", { id: currCollection.id })
+      .then((res) => {
+        const response = res.data;
+        setNotes(response);
+        console.log("asazzz");
+        if (indicator === "first") {
+          response.length > 0 && setCurrSlide(response[0]);
         } else {
-          some.push({ ...curr, notes: [...curr.notes, note] });
+          response.length > 0 && setCurrSlide(response[response.length - 1]);
         }
-      } else {
-        some.push(curr);
-      }
-    }
-    // console.log(some);
-    await update(ref(db, user.id), { collections: some });
+      });
   };
 
-  useEffect(() => {});
+  const addNote = async (note) => {
+    const uuid = uid();
+
+    // console.log( { id: uuid, note })
+
+    await axios
+      .post("http://localhost:5000/Notes/addNotes", {
+        note: { id: uuid, ...note },
+        id: currCollection.id,
+      })
+      .then((res) => {
+        setCurrSlide(res.data);
+      });
+
+    getNotes("last");
+    handleClose();
+  };
+
+  useEffect(() => {
+    if (currCollection !== null) {
+      console.log(currCollection);
+      setCurrSlide(null);
+      setNotes([]);
+      getNotes("first");
+    }
+  }, [currCollection]);
 
   const handleAdd = (event) => {
     event.preventDefault();
@@ -180,16 +180,15 @@ function Rightpanel() {
       const temp = document.getElementById("textArea").value;
       if (temp !== "") {
         const note = {
-          index: notes.length,
           type: "statement",
           statement: temp,
         };
-        setCurrSlide(note)
-        setNotes(note);
+
         addNote(note);
-        
+        // getNotes("last");
+
         document.getElementById("textArea").value = "";
-        handleClose();
+        
       }
     } else {
       const temp1 = document.getElementById("textArea").value;
@@ -198,18 +197,17 @@ function Rightpanel() {
       if (temp1 !== "" && temp2 !== "") {
         console.log(notes);
         const note = {
-          index: notes.length,
           type: "defination",
           statement: temp1,
           term: temp2,
         };
-        setCurrSlide(note)
-        setNotes(note);
+
         addNote(note);
-        
+        // getNotes("last");
+
         document.getElementById("textArea").value = "";
         document.getElementById("term").value = "";
-        handleClose();
+        
       }
     }
   };
@@ -247,9 +245,6 @@ function Rightpanel() {
 
   return (
     <div style={mainDiv}>
-      {/* {notes.map((note, index) => (
-        
-      ))} */}
       {currSlide !== null ? (
         <>
           <Paper elevation={5} style={paperStyle}>
@@ -316,9 +311,15 @@ function Rightpanel() {
           </Paper>
         </>
       ) : (
-        <Paper elevation={5} style={paperStyle}>
-          <Typography variant="h2">No notes</Typography>
-        </Paper>
+        <>
+          {currCollection === null ? (
+            <div>Hey {user.name}</div>
+          ) : (
+            <Paper elevation={5} style={paperStyle}>
+              <Typography variant="h2">No notes</Typography>
+            </Paper>
+          )}
+        </>
       )}
 
       <Fab style={fabStyle} onClick={handleClickOpen}>

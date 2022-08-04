@@ -17,6 +17,7 @@ import { db } from "../../firebase";
 import { set, ref, update, get } from "firebase/database";
 import { Popper } from "@mui/material";
 import Fade from "@mui/material/Fade";
+import axios from "axios";
 
 const mainDiv = {
   position: "fixed",
@@ -37,7 +38,7 @@ const btnSty = {
 
 function Leftpanel() {
   const { user } = useContext(AuthContext);
-  const { collections, setCollections, setCurrCollection } =
+  const { collections, setCollections, setCurrCollection,getCollections } =
     useContext(HomeContext);
   const [open, setOpen] = React.useState(false);
 
@@ -51,10 +52,9 @@ function Leftpanel() {
   const canBeOpen = open && Boolean(anchorEl);
   const id = canBeOpen ? "transition-popper" : undefined;
 
-  const handleCurrCollection =(event)=> {
+  const handleCurrCollection = (event) => {
     event.preventDefault();
-
-  }
+  };
 
   const handleNewCollection = async (event) => {
     event.preventDefault();
@@ -62,19 +62,15 @@ function Leftpanel() {
 
     if (temp !== "") {
       const uuid = uid();
-      if (collections.length === 0) {
-        const data = {
-          collections: [{ uuid, name: temp }],
-        };
-        await set(ref(db, user.id), data);
-      }else{
-        const data = await get(ref(db, user.id))
-        const newCol = {
-          uuid,name:temp
-        }
-
-        await update(ref(db, user.id), {collections:[...data.val().collections,newCol]})
-      }
+      await axios
+        .post("http://localhost:5000/Collections/newCollection", {
+          email: user.email,
+          id: uuid,
+          name: temp,
+        })
+        .then((res) => {
+          getCollections();
+        });
     }
     setOpen(false);
   };
@@ -104,7 +100,7 @@ function Leftpanel() {
           {collections.map((item, index) => (
             <div key={item.uuid}>
               <ListItem
-                onClick={(event)=>{
+                onClick={(event) => {
                   event.preventDefault();
                   setCurrCollection(item);
                 }}

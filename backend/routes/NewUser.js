@@ -40,6 +40,29 @@ router.post("/", async(req,res) => {
 
 })
 
+router.post("/singleSignOn", async (req, res) => {
+    const email = req.body.email;
+    const name = req.body.name;
+    const id = req.body.id;
+
+    const docRef = doc(db,"Users",email);
+
+    const userDoc = await getDoc(docRef);
+
+    if(userDoc.exists()) {
+        res.send("exists")
+    }else{
+        let data = {
+            email,name,id
+        }
+
+        await setDoc(docRef, data);
+
+        res.send("added");
+    }
+
+});
+
 
 
 export default router;

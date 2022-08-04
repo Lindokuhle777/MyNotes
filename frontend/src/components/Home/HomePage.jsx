@@ -15,8 +15,7 @@ import { AuthContext } from "../../MainContext";
 import Rightpanel from "./Rightpanel";
 import Leftpanel from "./Leftpanel";
 import { HomeContext } from "./HomeContext";
-import { onValue,ref } from "firebase/database";
-import {db} from "../../firebase";
+import axios from "axios";
 
 function HomePage() {
   const [openMenu, setOpenMenu] = React.useState(false);
@@ -29,7 +28,25 @@ function HomePage() {
     setOpenMenu(false);
   };
 
+  const getCollections = async () => {
+    
+    await axios
+      .post("http://localhost:5000/Collections/getCollections", {
+        email: user.email,
+      })
+      .then((res) => {
+        const temp = res.data;
+        setCollections(temp);
+        temp.length>0 && setCurrCollection(temp[temp.length-1]);
+        
+      });
+  };
 
+  useEffect(() => {
+    getCollections();
+  },[])
+
+  
 
   const handleClickOpen = () => {
     setOpenMenu(true);
@@ -44,16 +61,6 @@ function HomePage() {
     }
   };
 
-  useEffect(() => {
-    onValue(ref(db,user.id),snapshot=>{
-      const data = snapshot.val();
-      if(data !== null && data.collections !== undefined) {
-        setCollections(data.collections);
-      }
-    })
-    
-  },[]);
-
   return (
     <div>
       <HomeContext.Provider
@@ -62,6 +69,7 @@ function HomePage() {
           setCurrCollection,
           collections,
           setCollections,
+          getCollections
         }}
       >
         <Box sx={{ flexGrow: 1 }}>
