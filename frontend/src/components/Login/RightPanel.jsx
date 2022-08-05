@@ -77,7 +77,7 @@ function RightPanel() {
       password: values.password,
     };
 
-    await axios.post("http://localhost:5000/Login", data).then((res) => {
+    await axios.post("/Login", data).then((res) => {
       if (res.data.message === "correct") {
         // all good, move to the next page
 

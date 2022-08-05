@@ -38,7 +38,7 @@ export const AuthContextProvider = ({ children }) => {
             id: currUser.uid,
           });
           axios
-            .post("http://localhost:5000/NewUser/singleSignOn", {
+            .post("/NewUser/singleSignOn", {
               email: currUser.email,
               name: currUser.displayName,
               id: currUser.uid,

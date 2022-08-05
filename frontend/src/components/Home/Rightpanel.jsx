@@ -138,7 +138,7 @@ function Rightpanel() {
 
   const getNotes = async (indicator) => {
     await axios
-      .post("http://localhost:5000/Notes/getNotes", { id: currCollection.id })
+      .post("/Notes/getNotes", { id: currCollection.id })
       .then((res) => {
         const response = res.data;
         setNotes(response);
@@ -155,7 +155,7 @@ function Rightpanel() {
     const uuid = uid();
 
     await axios
-      .post("http://localhost:5000/Notes/addNotes", {
+      .post("/Notes/addNotes", {
         note: { id: uuid, ...note },
         id: currCollection.id,
       })

@@ -9,6 +9,10 @@ import Notes from "./routes/Notes.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+if(process.env.NODE_ENV === 'production'){
+  app.use(express.static("frontend/build"))
+}
+
 app.use(express.json());
 app.use(cors());
 

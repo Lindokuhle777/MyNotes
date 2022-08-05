@@ -32,7 +32,7 @@ function HomePage() {
 
   const getCollections = async () => {
     await axios
-      .post("http://localhost:5000/Collections/getCollections", {
+      .post("/Collections/getCollections", {
         email: user.email,
       })
       .then((res) => {

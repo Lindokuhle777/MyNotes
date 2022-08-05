@@ -48,7 +48,7 @@ function NewAccount({ handleNewAccount }) {
       name: values.name,
       password: values.password,
     };
-    await axios.post("http://localhost:5000/NewUser", data).then((response) => {
+    await axios.post("/NewUser", data).then((response) => {
       console.log(response);
       if (response.data === "added") {
         setMessage("ingenile")

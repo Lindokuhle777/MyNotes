@@ -63,7 +63,7 @@ export default function TemporaryDrawer() {
     if (temp !== "") {
       const uuid = uid();
       await axios
-        .post("http://localhost:5000/Collections/newCollection", {
+        .post("/Collections/newCollection", {
           email: user.email,
           id: uuid,
           name: temp,
