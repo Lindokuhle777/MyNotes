@@ -8,6 +8,7 @@ import Notes from "./routes/Notes.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+// app.use(express.static("frontend/build"))
 
 if(process.env.NODE_ENV === 'production'){
   app.use(express.static("frontend/build"))
