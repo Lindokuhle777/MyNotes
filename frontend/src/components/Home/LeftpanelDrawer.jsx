@@ -44,6 +44,7 @@ export default function TemporaryDrawer() {
     setCollections,
     setCurrCollection,
     getCollections,
+    currCollection,
   } = React.useContext(HomeContext);
   const { user } = useContext(AuthContext);
   const [open, setOpen] = React.useState(false);
@@ -139,10 +140,14 @@ export default function TemporaryDrawer() {
                       onClick={(event) => {
                         event.preventDefault();
                         setCurrCollection(item);
+                        handleCloseDrawer();
                       }}
                       button
                       style={{
-                        backgroundColor: "white",
+                        backgroundColor:
+                          currCollection.id !== item.id
+                            ? "white"
+                            : "rgba(49, 175, 180,0.1)",
                         borderRadius: "10px",
                         marginBottom: "5px",
                       }}
@@ -166,7 +171,6 @@ export default function TemporaryDrawer() {
           </div>
         </Drawer>
       </React.Fragment>
-      
     </div>
   );
 }

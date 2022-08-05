@@ -13,14 +13,16 @@ import axios from "axios";
 import { LoginContext } from "./LoginContext";
 
 const paperStyle = {
-  position: "absolute",
-  left: "20%",
-  right: "20%",
-  top: "20%",
-  bottom: "15%",
+  width: "70%",
+  margin: "0",
   textAlign: "center",
   display: "flex",
   flexDirection: "column",
+  paddingBottom: "30px",
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%,-50%)",
 };
 
 const fieldStyles = {

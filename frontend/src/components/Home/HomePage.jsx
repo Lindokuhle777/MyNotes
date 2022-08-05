@@ -23,6 +23,7 @@ function HomePage() {
   const [currCollection, setCurrCollection] = React.useState(null);
   const [collections, setCollections] = React.useState([]);
   const [openDrawer, setOpenDrawer] = React.useState(false);
+  const [isLoading,setIsLoading] = React.useState(false);
 
   const { logOut, setUser, user, desktop } = useContext(AuthContext);
 
@@ -78,7 +79,9 @@ function HomePage() {
           setCollections,
           getCollections,
           openDrawer,
-          handleCloseDrawer
+          handleCloseDrawer,
+          isLoading,
+          setIsLoading
         }}
       >
         <Box sx={{ flexGrow: 1 }}>

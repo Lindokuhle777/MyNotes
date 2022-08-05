@@ -29,7 +29,6 @@ const imgStyle = {
   left: 0,
   right: 0,
   top: "5%",
-
   margin: "auto",
 };
 

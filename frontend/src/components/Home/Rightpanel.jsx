@@ -16,7 +16,9 @@ import {
   Typography,
   IconButton,
   Tooltip,
+  Box,
 } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import React, { useEffect, useState, useContext } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -40,26 +42,7 @@ const navIcons = {
 };
 
 const testareaStyle = {
-  marginTop: "10px"
-}
-
-const paperStyle = {
-  position: "absolute",
-  top: 0,
-  bottom: 0,
-  left: 0,
-  right: 0,
-  margin: "auto",
-  textAlign: "center",
-  padding: "10px",
-  maxWidth: "60%",
-  maxHeight: "60%",
-  resize: "both",
-  // justifyContent: "center",
-  // display: "flex",
-  // alignItems: "center",
-  // verticalAlign: "middle",
-  // flexDirection: "column"
+  marginTop: "10px",
 };
 
 const fabStyle = {
@@ -111,17 +94,37 @@ function Rightpanel() {
     notes.length > 0 ? notes[0] : null
   );
 
-  const { currCollection } = useContext(HomeContext);
-  const { user,desktop } = useContext(AuthContext);
+  const { currCollection, isLoading, setIsLoading } = useContext(HomeContext);
+  const { user, desktop } = useContext(AuthContext);
 
   const mainDiv = {
     position: "absolute",
-    width: desktop? "80%":"100%",
-    left: desktop? "20%":0,
+    width: desktop ? "80%" : "100%",
+    left: desktop ? "20%" : 0,
     right: 0,
     top: 0,
     bottom: 0,
     backgroundColor: "rgba(0,0,0,0.01)",
+  };
+
+  const paperStyle = {
+    width: "70%",
+    height: !desktop ? "60%" : "50%",
+    margin: "0",
+    textAlign: "center",
+    display: "flex",
+    flexDirection: "column",
+    paddingBottom: "30px",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%,-50%)",
+    justifyContent: "center",
+    padding: "10px",
+    // display: "flex",
+    alignItems: "center",
+    verticalAlign: "middle",
+    // flexDirection: "column"
   };
 
   const toogle = () => {
@@ -142,7 +145,7 @@ function Rightpanel() {
       .then((res) => {
         const response = res.data;
         setNotes(response);
-        console.log("asazzz");
+        setIsLoading(false);
         if (indicator === "first") {
           response.length > 0 && setCurrSlide(response[0]);
         } else {
@@ -190,7 +193,6 @@ function Rightpanel() {
         // getNotes("last");
 
         document.getElementById("textArea").value = "";
-        
       }
     } else {
       const temp1 = document.getElementById("textArea").value;
@@ -209,14 +211,24 @@ function Rightpanel() {
 
         document.getElementById("textArea").value = "";
         document.getElementById("term").value = "";
-        
       }
     }
   };
 
   const editSlide = () => {};
 
-  const deleteSlide = () => {};
+  const deleteSlide = async () => {
+    await axios
+      .post("/Notes/deleteNote", {
+        noteID: currSlide.id,
+        collectionID: currCollection.id,
+      })
+      .then((res) => {
+        console.log(res.data);
+      });
+
+    getNotes("last");
+  };
 
   const handleNavigation = (curr) => {
     switch (curr) {
@@ -247,79 +259,91 @@ function Rightpanel() {
 
   return (
     <div style={mainDiv}>
-      {currSlide !== null ? (
-        <>
-          <Paper elevation={5} style={paperStyle}>
-            {currSlide.type == "defination" && (
-              <Typography gutterBottom variant="h3">
-                {currSlide.term}
-              </Typography>
-            )}
-            <div
-              style={{
-                overflowY: "auto",
-                maxHeight: "80%",
-                textAlign: "center",
-              }}
-            >
-              <Typography variant="h5">{currSlide.statement}</Typography>
-            </div>
-
-            <div style={navIcons}>
-              <Tooltip title="Delete">
-                <IconButton
-                  onClick={(event) => {
-                    event.preventDefault();
-                    handleNavigation("delete");
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Edit">
-                <IconButton
-                  onClick={(event) => {
-                    event.preventDefault();
-                    handleNavigation("edit");
-                  }}
-                >
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Previous">
-                <IconButton
-                  onClick={(event) => {
-                    event.preventDefault();
-                    handleNavigation("prev");
-                  }}
-                >
-                  <ArrowBackIcon />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Next">
-                <IconButton
-                  onClick={(event) => {
-                    event.preventDefault();
-                    handleNavigation("next");
-                  }}
-                >
-                  <ArrowForwardIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
-          </Paper>
-        </>
+      {isLoading ? (
+        <Box style={paperStyle}>
+          <CircularProgress />
+        </Box>
       ) : (
         <>
-          {currCollection === null ? (
-            <div>Hey {user.name}</div>
+          {currSlide !== null ? (
+            <>
+              <Paper elevation={5} style={paperStyle}>
+                {currSlide.type === "defination" && (
+                  <Typography gutterBottom variant="h3">
+                    {currSlide.term}
+                  </Typography>
+                )}
+                <div
+                  style={{
+                    overflowY: "auto",
+                    maxHeight: "80%",
+                    textAlign: "center",
+                    marginBottom: !desktop ? "20%" : "7%",
+                  }}
+                >
+                  <Typography variant="h5" gutterBottom>
+                    {currSlide.statement}
+                  </Typography>
+                </div>
+
+                <div style={navIcons}>
+                  <Tooltip title="Delete">
+                    <IconButton
+                      onClick={(event) => {
+                        event.preventDefault();
+                        handleNavigation("delete");
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title="Edit">
+                    <IconButton
+                      onClick={(event) => {
+                        event.preventDefault();
+                        handleNavigation("edit");
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title="Previous">
+                    <IconButton
+                      onClick={(event) => {
+                        event.preventDefault();
+                        handleNavigation("prev");
+                      }}
+                    >
+                      <ArrowBackIcon />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title="Next">
+                    <IconButton
+                      onClick={(event) => {
+                        event.preventDefault();
+                        handleNavigation("next");
+                      }}
+                    >
+                      <ArrowForwardIcon />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+                
+              </Paper>
+            </>
           ) : (
-            <Paper elevation={5} style={paperStyle}>
-              <Typography variant="h2">No notes</Typography>
-            </Paper>
+            <>
+              {currCollection === null ? (
+                <div>Hey {user.name}</div>
+              ) : (
+                <Paper elevation={5} style={paperStyle}>
+                  <Typography variant="h2">No notes</Typography>
+                </Paper>
+              )}
+            </>
           )}
         </>
       )}
@@ -334,7 +358,6 @@ function Rightpanel() {
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
-        
       >
         <DialogTitle>{"New Card"}</DialogTitle>
         <DialogContent style={{ display: "flex", flexDirection: "column" }}>

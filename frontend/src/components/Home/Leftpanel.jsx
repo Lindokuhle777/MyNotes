@@ -38,8 +38,14 @@ const btnSty = {
 
 function Leftpanel() {
   const { user } = useContext(AuthContext);
-  const { collections, setCollections, setCurrCollection,getCollections } =
-    useContext(HomeContext);
+  const {
+    collections,
+    setCollections,
+    setCurrCollection,
+    currCollection,
+    getCollections,
+    setIsLoading
+  } = useContext(HomeContext);
   const [open, setOpen] = React.useState(false);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -75,7 +81,6 @@ function Leftpanel() {
     setOpen(false);
   };
   return (
-    
     <div style={mainDiv}>
       <Typography variant="h4" style={{ color: "white" }}>
         Collections
@@ -104,12 +109,19 @@ function Leftpanel() {
                 onClick={(event) => {
                   event.preventDefault();
                   setCurrCollection(item);
+                  setIsLoading(true);
                 }}
                 button
                 style={{
-                  backgroundColor: "white",
+                  backgroundColor:
+                    currCollection.id !== item.id
+                      ? "white"
+                      : "rgba(49, 175, 180,0.1)",
                   borderRadius: "10px",
                   marginBottom: "5px",
+                  color: currCollection.id !== item.id
+                  ? "black"
+                  : "white",
                 }}
                 secondaryAction={
                   <IconButton edge="end" aria-label="delete">
