@@ -44,14 +44,14 @@ function NewAccount({ handleNewAccount }) {
   };
 
   const onSubmit = async (values, props) => {
-    // console.log(values);
+    
     const data = {
       email: values.email,
       name: values.name,
       password: values.password,
     };
     await axios.post("/NewUser", data).then((response) => {
-      console.log(response);
+     
       if (response.data === "added") {
         setMessage("ingenile")
         setOpen(true)

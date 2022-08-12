@@ -172,7 +172,7 @@ function Rightpanel() {
 
   useEffect(() => {
     if (currCollection !== null) {
-      console.log(currCollection);
+      
       setCurrSlide(null);
       setNotes([]);
       getNotes("first");
@@ -199,7 +199,7 @@ function Rightpanel() {
       const temp2 = document.getElementById("term").value;
 
       if (temp1 !== "" && temp2 !== "") {
-        console.log(notes);
+        
         const note = {
           type: "defination",
           statement: temp1,
@@ -215,32 +215,23 @@ function Rightpanel() {
     }
   };
 
-  const editSlide = () => {};
+  const editSlide = () => {alert("Feature coming soon...");};
 
   const deleteSlide = async () => {
-    await axios
-      .post("/Notes/deleteNote", {
-        noteID: currSlide.id,
-        collectionID: currCollection.id,
-      })
-      .then((res) => {
-        console.log(res.data);
-      });
-
-    getNotes("last");
+    alert("Feature coming soon...");
   };
 
   const handleNavigation = (curr) => {
     switch (curr) {
       case "prev":
         if (currSlide.index !== 0) {
-          // console.log()
+         
           setCurrSlide(notes[currSlide.index - 1]);
         }
         break;
 
       case "next":
-        // console.log(currSlide.index !== notes.length - 1)
+       
         if (currSlide.index !== notes.length - 1) {
           setCurrSlide(notes[currSlide.index + 1]);
         }

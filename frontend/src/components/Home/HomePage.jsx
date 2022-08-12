@@ -56,6 +56,11 @@ function HomePage() {
     setOpenDrawer(true);
   };
 
+  const handleProfile = (e) => {
+    e.preventDefault();
+    alert("Feature coming soon...");
+  }
+
   const handleClickOpen = () => {
     setOpenMenu(true);
   };
@@ -126,7 +131,7 @@ function HomePage() {
                 open={openMenu}
                 onClose={handleClose}
               >
-                <MenuItem>Profile</MenuItem>
+                <MenuItem onClick={handleProfile}>Profile</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </Toolbar>

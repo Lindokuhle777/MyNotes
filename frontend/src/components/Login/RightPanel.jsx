@@ -105,12 +105,17 @@ function RightPanel() {
     setSignUp(!signUp);
   };
 
+  const handleFacebookSignIn = (event) => {
+    event.preventDefault();
+    alert("Feature coming soon...");
+  }
+
   const handleGoogleSignIn = async (event) => {
     event.preventDefault();
     try {
       await googleSignIn();
     } catch (err) {
-      console.log(err);
+     
     }
   };
 
@@ -199,6 +204,7 @@ function RightPanel() {
           <Button
             style={{ ...btnStyle, backgroundColor: "#31AFB4", color: "white" }}
             variant="outlined"
+            onClick={handleFacebookSignIn}
           >
             sign in with Facebook
           </Button>
