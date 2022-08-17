@@ -18,6 +18,7 @@ import {
   Tooltip,
   Box,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import CircularProgress from "@mui/material/CircularProgress";
 import React, { useEffect, useState, useContext } from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -90,6 +91,7 @@ function Rightpanel() {
   const [open, setOpen] = useState(false);
   const [statement, setStatement] = useState(true);
   const [notes, setNotes] = useState([]);
+  const [onCardLoading, setOnCardLoading] = useState(false);
   const [currSlide, setCurrSlide] = useState(
     notes.length > 0 ? notes[0] : null
   );
@@ -145,12 +147,20 @@ function Rightpanel() {
       .then((res) => {
         const response = res.data;
         setNotes(response);
-        setIsLoading(false);
+
         if (indicator === "first") {
           response.length > 0 && setCurrSlide(response[0]);
-        } else {
+        } else if (indicator === "last") {
           response.length > 0 && setCurrSlide(response[response.length - 1]);
+        } else {
+          if (response.length > 0) {
+            setCurrSlide(response[indicator]);
+          } else {
+            setCurrSlide(null);
+          }
+          // response.length > 0 &&
         }
+        setIsLoading(false);
       });
   };
 
@@ -172,7 +182,6 @@ function Rightpanel() {
 
   useEffect(() => {
     if (currCollection !== null) {
-      
       setCurrSlide(null);
       setNotes([]);
       getNotes("first");
@@ -199,7 +208,6 @@ function Rightpanel() {
       const temp2 = document.getElementById("term").value;
 
       if (temp1 !== "" && temp2 !== "") {
-        
         const note = {
           type: "defination",
           statement: temp1,
@@ -215,23 +223,45 @@ function Rightpanel() {
     }
   };
 
-  const editSlide = () => {alert("Feature coming soon...");};
+  const editSlide = () => {
+    alert("Feature coming soon...");
+  };
 
   const deleteSlide = async () => {
-    alert("Feature coming soon...");
+    // alert("Feature coming soon...");
+
+    const temp = {
+      collectionID: currCollection.id,
+      noteID: currSlide.id,
+    };
+    setOnCardLoading(true);
+    await axios
+      .post("/Notes/deleteNote", temp)
+      .then((res) => {
+        if (res.data === "deleted") {
+          if (currSlide.index === 0) {
+            //deleting the last
+            getNotes(currSlide.index);
+          } else if (currSlide.index === notes.length - 1) {
+            getNotes(currSlide.index - 1);
+          } else {
+            getNotes(currSlide.index);
+          }
+          // getNotes(currSlide.index);
+        }
+      });
+    setOnCardLoading(false);
   };
 
   const handleNavigation = (curr) => {
     switch (curr) {
       case "prev":
         if (currSlide.index !== 0) {
-         
           setCurrSlide(notes[currSlide.index - 1]);
         }
         break;
 
       case "next":
-       
         if (currSlide.index !== notes.length - 1) {
           setCurrSlide(notes[currSlide.index + 1]);
         }
@@ -259,21 +289,40 @@ function Rightpanel() {
           {currSlide !== null ? (
             <>
               <Paper elevation={5} style={paperStyle}>
-                {currSlide.type === "defination" && (
-                  <Typography gutterBottom variant="h3">
-                    {currSlide.term}
-                  </Typography>
+                {onCardLoading ? (
+                  <Box style={paperStyle}>
+                    <CircularProgress />
+                  </Box>
+                ) : (
+                  <>
+                    {currSlide.type === "defination" && (
+                      <Typography gutterBottom variant="h3">
+                        {currSlide.term}
+                      </Typography>
+                    )}
+                    <div
+                      style={{
+                        overflowY: "auto",
+                        maxHeight: "80%",
+                        textAlign: "center",
+                        marginBottom: !desktop ? "20%" : "7%",
+                      }}
+                    >
+                      <Typography variant="h5" gutterBottom>
+                        {currSlide.statement}
+                      </Typography>
+                    </div>
+                  </>
                 )}
                 <div
                   style={{
-                    overflowY: "auto",
-                    maxHeight: "80%",
-                    textAlign: "center",
-                    marginBottom: !desktop ? "20%" : "7%",
+                    position: "absolute",
+                    left: "15px",
+                    bottom: "5px",
                   }}
                 >
-                  <Typography variant="h5" gutterBottom>
-                    {currSlide.statement}
+                  <Typography variant="h6" gutterBottom>
+                    {currSlide.index + 1 + " of " + notes.length}
                   </Typography>
                 </div>
 
@@ -322,13 +371,21 @@ function Rightpanel() {
                     </IconButton>
                   </Tooltip>
                 </div>
-                
               </Paper>
             </>
           ) : (
             <>
               {currCollection === null ? (
-                <div>Hey {user.name}</div>
+                <Paper elevation={5} style={paperStyle}>
+                  <Typography variant="h4" gutterBottom>
+                    Hey {user.name.split(" ")[0]}
+                  </Typography>
+                  {!desktop && (
+                    <Typography variant="h6" gutterBottom>
+                      Open the menu to create your first collection
+                    </Typography>
+                  )}
+                </Paper>
               ) : (
                 <Paper elevation={5} style={paperStyle}>
                   <Typography variant="h2">No notes</Typography>

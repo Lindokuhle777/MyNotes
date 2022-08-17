@@ -27,9 +27,7 @@ function HomePage() {
 
   const { logOut, setUser, user, desktop } = useContext(AuthContext);
 
-  const handleClose = () => {
-    setOpenMenu(false);
-  };
+  
 
   const getCollections = async () => {
     await axios
@@ -40,7 +38,16 @@ function HomePage() {
         const temp = res.data;
         setCollections(temp);
         temp.length > 0 && setCurrCollection(temp[temp.length - 1]);
+        
+
       });
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  
+  const handleClose = () => {
+    setAnchorEl(null);
+    setOpenMenu(false);
   };
 
   useEffect(() => {
@@ -61,8 +68,9 @@ function HomePage() {
     alert("Feature coming soon...");
   }
 
-  const handleClickOpen = () => {
+  const handleClickOpen = (event) => {
     setOpenMenu(true);
+    setAnchorEl(event.currentTarget);
   };
 
   const handleLogout = async () => {
@@ -119,6 +127,7 @@ function HomePage() {
               </IconButton>
               <Menu
                 id="menu-appbar"
+                anchorEl={anchorEl}
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",

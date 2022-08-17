@@ -44,7 +44,7 @@ function Leftpanel() {
     setCurrCollection,
     currCollection,
     getCollections,
-    setIsLoading
+    setIsLoading,
   } = useContext(HomeContext);
   const [open, setOpen] = React.useState(false);
 
@@ -104,7 +104,8 @@ function Leftpanel() {
           }}
         >
           {collections.map((item, index) => (
-            <div key={item.uuid}>
+            <div key={item.id+"leftPanel"}>
+              
               <ListItem
                 onClick={(event) => {
                   event.preventDefault();
@@ -119,15 +120,8 @@ function Leftpanel() {
                       : "rgba(49, 175, 180,0.1)",
                   borderRadius: "10px",
                   marginBottom: "5px",
-                  color: currCollection.id !== item.id
-                  ? "black"
-                  : "white",
+                  color: currCollection.id !== item.id ? "black" : "white",
                 }}
-                secondaryAction={
-                  <IconButton edge="end" aria-label="delete">
-                    <DeleteIcon />
-                  </IconButton>
-                }
               >
                 <ListItemAvatar>
                   <Avatar>

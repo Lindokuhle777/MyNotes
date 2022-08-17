@@ -63,6 +63,8 @@ export default function TemporaryDrawer() {
     event.preventDefault();
   };
 
+  
+
   const handleNewCollection = async (event) => {
     event.preventDefault();
     const temp = document.getElementById("collectionName").value;
@@ -77,6 +79,7 @@ export default function TemporaryDrawer() {
         })
         .then((res) => {
           getCollections();
+
         });
     }
     setOpen(false);
@@ -135,7 +138,7 @@ export default function TemporaryDrawer() {
                 }}
               >
                 {collections.map((item, index) => (
-                  <div key={item.uuid}>
+                  <div key={item.id+"Drawer"}>
                     <ListItem
                       onClick={(event) => {
                         event.preventDefault();
@@ -151,11 +154,7 @@ export default function TemporaryDrawer() {
                         borderRadius: "10px",
                         marginBottom: "5px",
                       }}
-                      secondaryAction={
-                        <IconButton edge="end" aria-label="delete">
-                          <DeleteIcon />
-                        </IconButton>
-                      }
+                      
                     >
                       <ListItemAvatar>
                         <Avatar>

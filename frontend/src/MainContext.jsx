@@ -27,23 +27,24 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const subscribe = onAuthStateChanged(auth, (currUser) => {
+    const subscribe = onAuthStateChanged(auth, async(currUser) => {
       if (user === null) {
         if (currUser === null) {
           setUser(currUser);
         } else {
-          setUser({
-            email: currUser.email,
-            name: currUser.displayName,
-            id: currUser.uid,
-          });
-          axios
+          
+          await axios
             .post("/NewUser/singleSignOn", {
               email: currUser.email,
               name: currUser.displayName,
               id: currUser.uid,
             })
             .then((res) => {
+              setUser({
+                email: currUser.email,
+                name: currUser.displayName,
+                id: currUser.uid,
+              });
              
             });
         }
