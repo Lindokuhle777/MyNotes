@@ -1,41 +1,22 @@
 import {
   Paper,
   Typography,
-  TextField,
   Button,
   IconButton,
 } from "@mui/material";
-import React,{useContext} from "react";
+import React, { useContext } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as YUP from "yup";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import axios from "axios";
 import { LoginContext } from "./LoginContext";
+import CssTextField from "../CssTextField";
 
-const paperStyle = {
-  width: "70%",
-  margin: "0",
-  textAlign: "center",
-  display: "flex",
-  flexDirection: "column",
-  paddingBottom: "30px",
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%,-50%)",
-};
 
-const fieldStyles = {
-  marginTop: "3%",
-};
-const btnStyle = {
-  marginTop: "6%",
-  marginBottom: "6%",
-  backgroundColor: "#31AFB4",
-  color: "#FFFFFF"
-};
+
 function NewAccount({ handleNewAccount }) {
   const { setMessage, setOpen } = useContext(LoginContext);
+
   const initialValues = {
     name: "",
     email: "",
@@ -44,20 +25,20 @@ function NewAccount({ handleNewAccount }) {
   };
 
   const onSubmit = async (values, props) => {
-    // console.log(values);
+
     const data = {
       email: values.email,
       name: values.name,
       password: values.password,
     };
     await axios.post("/NewUser", data).then((response) => {
-      console.log(response);
+
       if (response.data === "added") {
-        setMessage("ingenile")
+        setMessage("Account Successfully Created")
         setOpen(true)
         handleNewAccount();
       } else {
-        setMessage("Account with that email exists")
+        setMessage("Account with that email already exists")
         setOpen(true)
       }
     });
@@ -80,17 +61,19 @@ function NewAccount({ handleNewAccount }) {
 
   return (
     <Paper elevation={15} style={paperStyle}>
-      <div style={{ display: "flex", flexDirection: "row" }}>
+
+      <div style={{ position: "absolute", left: 10, top: 30 }}>
         <IconButton onClick={handleNewAccount}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography
-          variant="h4"
-          style={{ marginTop: "5%", marginBottom: "10%",color: "#115571" }}
-        >
-          New Account
-        </Typography>
       </div>
+
+      <Typography
+        variant="h4"
+        style={{ marginTop: "5%", marginBottom: "5%", color: "#115571" }}
+      >
+        New Account
+      </Typography>
 
       <Formik
         initialValues={initialValues}
@@ -98,9 +81,15 @@ function NewAccount({ handleNewAccount }) {
         validation={validation}
       >
         {(props) => (
-          <Form>
+          <Form style={{
+            display: "flex",
+            flexDirection: "column",
+            paddingLeft: "7%",
+            paddingRight: "7%",
+          }}>
+            
             <Field
-              as={TextField}
+              as={CssTextField}
               label="Name"
               name="name"
               type="text"
@@ -109,7 +98,7 @@ function NewAccount({ handleNewAccount }) {
               helperText={<ErrorMessage name="name" />}
             />
             <Field
-              as={TextField}
+              as={CssTextField}
               label="Email"
               name="email"
               type="email"
@@ -118,7 +107,7 @@ function NewAccount({ handleNewAccount }) {
               helperText={<ErrorMessage name="email" />}
             />
             <Field
-              as={TextField}
+              as={CssTextField}
               label="Password"
               name="password"
               type="password"
@@ -127,7 +116,7 @@ function NewAccount({ handleNewAccount }) {
               helperText={<ErrorMessage name="password" />}
             />
             <Field
-              as={TextField}
+              as={CssTextField}
               label="Confirm password"
               name="conPassword"
               type="password"
@@ -144,5 +133,27 @@ function NewAccount({ handleNewAccount }) {
     </Paper>
   );
 }
+
+const paperStyle = {
+  width: "70%",
+  margin: "0",
+  textAlign: "center",
+  display: "flex",
+  flexDirection: "column",
+  paddingTop: "10px",
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%,-50%)",
+};
+const fieldStyles = {
+  margin: "2% 0",
+};
+const btnStyle = {
+  marginTop: "6%",
+  marginBottom: "6%",
+  backgroundColor: "#31AFB4",
+  color: "#FFFFFF"
+};
 
 export default NewAccount;

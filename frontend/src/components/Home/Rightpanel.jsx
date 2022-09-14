@@ -1,49 +1,17 @@
 import {
-  Paper,
   Fab,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  Slide,
-  DialogTitle,
-  Button,
-  TextField,
-  TextareaAutosize,
-  Checkbox,
-  FormGroup,
-  FormControlLabel,
-  Typography,
-  IconButton,
-  Tooltip,
-  Box,
 } from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
 import React, { useEffect, useState, useContext } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { HomeContext } from "./HomeContext";
 import { AuthContext } from "../../MainContext";
 import { uid } from "uid";
-import { db } from "../../firebase";
 import axios from "axios";
+import Body from "./Body";
+import NewSlideDialog from "./NewSlideDialog";
+import HomeAppBar from "./HomeAppBar";
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
-const navIcons = {
-  position: "absolute",
-  right: "5px",
-  bottom: "5px",
-};
-
-const testareaStyle = {
-  marginTop: "10px",
-};
 
 const fabStyle = {
   backgroundColor: "#31AFB4",
@@ -53,49 +21,17 @@ const fabStyle = {
   bottom: "5%",
 };
 
-const dummyNotes = [
-  {
-    index: 0,
-    type: "statement",
-    statement:
-      "Write in your own voice: Use your own words to describe your qualifications to make your statement feel more personal and uniquely you.",
-  },
-  {
-    index: 1,
-    type: "defination",
-    term: "Some term 1",
-    statement:
-      "Write in your own voice: Use your own words to describe your qualifications to make your statement feel more personal and uniquely you.",
-  },
-  {
-    index: 2,
-    type: "defination",
-    term: "Some term 2",
-    statement: "Write in your own voice: Use your own words to describe your",
-  },
-  {
-    index: 3,
-    type: "statement",
-    statement:
-      "Write in your own voice: Use your own words to describe your qualifications to make your statement feel more personal and uniquely you.Write in your own voice: Use your own words to describe your qualifications to make your statement feel more personal and uniquely you.Write in your own voice: Use your own words to describe your qualifications to make your statement feel more personal and uniquely you.Write in your own voice: Use your own words to describe your qualifications to make your statement feel more personal and uniquely you.",
-  },
-  {
-    index: 4,
-    type: "statement",
-    statement: "Write in your own voice: Use your",
-  },
-];
 
 function Rightpanel() {
-  const [open, setOpen] = useState(false);
-  const [statement, setStatement] = useState(true);
+  const { desktop } = useContext(AuthContext);
+  const { currCollection, setIsLoading } = useContext(HomeContext);
+  const [openSlideDialog, setOpenSlideDialog] = useState(false);
   const [notes, setNotes] = useState([]);
+  const [statement, setStatement] = useState(true);
+  const [onCardLoading, setOnCardLoading] = useState(false);
   const [currSlide, setCurrSlide] = useState(
     notes.length > 0 ? notes[0] : null
   );
-
-  const { currCollection, isLoading, setIsLoading } = useContext(HomeContext);
-  const { user, desktop } = useContext(AuthContext);
 
   const mainDiv = {
     position: "absolute",
@@ -107,36 +43,17 @@ function Rightpanel() {
     backgroundColor: "rgba(0,0,0,0.01)",
   };
 
-  const paperStyle = {
-    width: "70%",
-    height: !desktop ? "60%" : "50%",
-    margin: "0",
-    textAlign: "center",
-    display: "flex",
-    flexDirection: "column",
-    paddingBottom: "30px",
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%,-50%)",
-    justifyContent: "center",
-    padding: "10px",
-    // display: "flex",
-    alignItems: "center",
-    verticalAlign: "middle",
-    // flexDirection: "column"
-  };
-
   const toogle = () => {
+    console.log("hiii");
     setStatement(!statement);
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleClickOpenDialog = () => {
+    setOpenSlideDialog(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleCloseDialog = () => {
+    setOpenSlideDialog(false);
   };
 
   const getNotes = async (indicator) => {
@@ -145,12 +62,20 @@ function Rightpanel() {
       .then((res) => {
         const response = res.data;
         setNotes(response);
-        setIsLoading(false);
+
         if (indicator === "first") {
           response.length > 0 && setCurrSlide(response[0]);
-        } else {
+        } else if (indicator === "last") {
           response.length > 0 && setCurrSlide(response[response.length - 1]);
+        } else {
+          if (response.length > 0) {
+            setCurrSlide(response[indicator]);
+          } else {
+            setCurrSlide(null);
+          }
+          // response.length > 0 &&
         }
+        setIsLoading(false);
       });
   };
 
@@ -167,17 +92,8 @@ function Rightpanel() {
       });
 
     getNotes("last");
-    handleClose();
+    handleCloseDialog();
   };
-
-  useEffect(() => {
-    if (currCollection !== null) {
-      console.log(currCollection);
-      setCurrSlide(null);
-      setNotes([]);
-      getNotes("first");
-    }
-  }, [currCollection]);
 
   const handleAdd = (event) => {
     event.preventDefault();
@@ -199,7 +115,6 @@ function Rightpanel() {
       const temp2 = document.getElementById("term").value;
 
       if (temp1 !== "" && temp2 !== "") {
-        console.log(notes);
         const note = {
           type: "defination",
           statement: temp1,
@@ -215,32 +130,45 @@ function Rightpanel() {
     }
   };
 
-  const editSlide = () => {};
+  const editSlide = () => {
+    alert("Feature coming soon...");
+  };
 
   const deleteSlide = async () => {
-    await axios
-      .post("/Notes/deleteNote", {
-        noteID: currSlide.id,
-        collectionID: currCollection.id,
-      })
-      .then((res) => {
-        console.log(res.data);
-      });
+    // alert("Feature coming soon...");
 
-    getNotes("last");
+    const temp = {
+      collectionID: currCollection.id,
+      noteID: currSlide.id,
+    };
+    setOnCardLoading(true);
+    await axios
+      .post("/Notes/deleteNote", temp)
+      .then((res) => {
+        if (res.data === "deleted") {
+          if (currSlide.index === 0) {
+            //deleting the last
+            getNotes(currSlide.index);
+          } else if (currSlide.index === notes.length - 1) {
+            getNotes(currSlide.index - 1);
+          } else {
+            getNotes(currSlide.index);
+          }
+          // getNotes(currSlide.index);
+        }
+      });
+    setOnCardLoading(false);
   };
 
   const handleNavigation = (curr) => {
     switch (curr) {
       case "prev":
         if (currSlide.index !== 0) {
-          // console.log()
           setCurrSlide(notes[currSlide.index - 1]);
         }
         break;
 
       case "next":
-        // console.log(currSlide.index !== notes.length - 1)
         if (currSlide.index !== notes.length - 1) {
           setCurrSlide(notes[currSlide.index + 1]);
         }
@@ -257,153 +185,41 @@ function Rightpanel() {
     }
   };
 
+  useEffect(() => {
+    if (currCollection !== null) {
+      setCurrSlide(null);
+      setNotes([]);
+      getNotes("first");
+    }
+  }, [currCollection]);
+
   return (
     <div style={mainDiv}>
-      {isLoading ? (
-        <Box style={paperStyle}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <>
-          {currSlide !== null ? (
-            <>
-              <Paper elevation={5} style={paperStyle}>
-                {currSlide.type === "defination" && (
-                  <Typography gutterBottom variant="h3">
-                    {currSlide.term}
-                  </Typography>
-                )}
-                <div
-                  style={{
-                    overflowY: "auto",
-                    maxHeight: "80%",
-                    textAlign: "center",
-                    marginBottom: !desktop ? "20%" : "7%",
-                  }}
-                >
-                  <Typography variant="h5" gutterBottom>
-                    {currSlide.statement}
-                  </Typography>
-                </div>
 
-                <div style={navIcons}>
-                  <Tooltip title="Delete">
-                    <IconButton
-                      onClick={(event) => {
-                        event.preventDefault();
-                        handleNavigation("delete");
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
+      <HomeAppBar currCollectionName={currCollection?.name} />
 
-                  <Tooltip title="Edit">
-                    <IconButton
-                      onClick={(event) => {
-                        event.preventDefault();
-                        handleNavigation("edit");
-                      }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
+      <Body
+        handleNavigation={handleNavigation}
+        currSlide={currSlide}
+        notesLength={notes.length}
+        onCardLoading={onCardLoading}
+        statement={statement}
+      />
 
-                  <Tooltip title="Previous">
-                    <IconButton
-                      onClick={(event) => {
-                        event.preventDefault();
-                        handleNavigation("prev");
-                      }}
-                    >
-                      <ArrowBackIcon />
-                    </IconButton>
-                  </Tooltip>
+      <NewSlideDialog
+        openSlideDialog={openSlideDialog}
+        handleCloseDialog={handleCloseDialog}
+        desktop={desktop}
+        statement={statement}
+        toogle={toogle}
+        handleAdd={handleAdd} />
 
-                  <Tooltip title="Next">
-                    <IconButton
-                      onClick={(event) => {
-                        event.preventDefault();
-                        handleNavigation("next");
-                      }}
-                    >
-                      <ArrowForwardIcon />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-                
-              </Paper>
-            </>
-          ) : (
-            <>
-              {currCollection === null ? (
-                <div>Hey {user.name}</div>
-              ) : (
-                <Paper elevation={5} style={paperStyle}>
-                  <Typography variant="h2">No notes</Typography>
-                </Paper>
-              )}
-            </>
-          )}
-        </>
-      )}
-
-      <Fab style={fabStyle} onClick={handleClickOpen}>
+      <Fab style={fabStyle} onClick={handleClickOpenDialog}>
         <AddIcon />
       </Fab>
 
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle>{"New Card"}</DialogTitle>
-        <DialogContent style={{ display: "flex", flexDirection: "column" }}>
-          <FormGroup
-            style={{ width: "20%", marginBottom: "5%", color: "black" }}
-          >
-            <FormControlLabel
-              control={<Checkbox checked={statement} />}
-              label="Statement"
-              onClick={toogle}
-            />
-          </FormGroup>
-          {!statement && (
-            <TextField
-              required
-              id="term"
-              type="text"
-              label="Term"
-              size="small"
-            />
-          )}
-          <TextareaAutosize
-            id="textArea"
-            required
-            aria-label="minimum height"
-            minRows={3}
-            maxRows={6}
-            placeholder={statement ? "Statement" : "Defination"}
-            style={testareaStyle}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={handleClose}
-            style={{ backgroundColor: "#115571", color: "#FFFFFF" }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleAdd}
-            style={{ backgroundColor: "#31AFB4", color: "#FFFFFF" }}
-          >
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
+
+
     </div>
   );
 }
