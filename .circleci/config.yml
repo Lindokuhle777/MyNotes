@@ -4,15 +4,9 @@ orbs:
     heroku: circleci/heroku@1.2.6 # Use the Heroku orb in your config
 
 workflows:
-    heroku_deploy:
-    jobs:
-        - checkout
-        - build
-        - heroku/deploy-via-git:vhi
-            auth:
-              user
-            requires:
-            - build # only run deploy-via-git job if the build job has completed
-            filters:
-            branches:
-                only: master # only run deploy-via-git job on main branch
+    deploy:
+      jobs:
+        - heroku/deploy-via-git:
+            api-key: HEROKU_API_KEY 
+            app-name: HEROKU_APP_NAME 
+            branch: master 
