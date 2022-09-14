@@ -2,15 +2,12 @@ import React, { useContext, useState } from "react";
 import LeftPanel from "./LeftPanel";
 import { LoginContext } from "./LoginContext";
 import RightPanel from "./RightPanel";
-import { useMediaQuery } from "@mui/material";
-import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { AuthContext } from "../../MainContext";
 
 function Login() {
-  const [user, setUser] = useState("sabelo");
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const {desktop} = useContext(AuthContext);
@@ -37,7 +34,7 @@ function Login() {
   );
 
   return (
-    <LoginContext.Provider value={{ user, handleClose, setOpen, setMessage }}>
+    <LoginContext.Provider value={{handleClose, setOpen, setMessage }}>
       <div style={{ display: "flex", flexDirection: "row" }}>
         {desktop && <LeftPanel />}
         <RightPanel />

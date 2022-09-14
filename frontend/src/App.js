@@ -5,27 +5,23 @@ import { AuthContextProvider } from "./MainContext";
 import HomePage from "./components/Home/HomePage";
 import Protected from "./Protected";
 
-
 function App() {
   return (
-    <div >
-      
+    <BrowserRouter>
       <AuthContextProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" exact element={<Login />} />
-            <Route
-              path="/Home"
-              element={
-                <Protected>
-                  <HomePage />
-                </Protected>
-              }
-            />
-          </Routes>
-        </BrowserRouter>
+        <Routes>
+          <Route path="/" exact element={<Login />} />
+          <Route
+            path="/Home"
+            element={
+              <Protected>
+                <HomePage />
+              </Protected>
+            }
+          />
+        </Routes>
       </AuthContextProvider>
-    </div>
+    </BrowserRouter>
   );
 }
 

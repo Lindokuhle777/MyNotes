@@ -3,7 +3,6 @@ import {
   CssBaseline,
   Divider,
   Paper,
-  TextField,
   Typography,
 } from "@mui/material";
 import React, { useContext, useState, useEffect } from "react";
@@ -12,6 +11,7 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as YUP from "yup";
 import axios from "axios";
 import NewAccount from "./NewAccount";
+import CssTextField from "../CssTextField";
 import { AuthContext } from "../../MainContext";
 import { useNavigate } from "react-router-dom";
 
@@ -62,7 +62,7 @@ function RightPanel() {
     top: 0,
     bottom: 0,
     backgroundColor: "rgba(0,0,0,0.1)",
-    backgroundImage: !desktop?`url(logo2.png)`:"none",
+    backgroundImage: !desktop ? `url(logo2.png)` : "none",
   };
 
   const initialValues = {
@@ -82,6 +82,8 @@ function RightPanel() {
 
         setUser({ email: data.email, name: res.data.name, id: res.data.id });
         navigate("Home");
+        //save the currect user in localStorage so that they can be logged in automatically next time
+        window.localStorage.setItem("MyNotesUser",JSON.stringify({ email: data.email, name: res.data.name}));
 
         props.resetForm();
       } else if (res.data === "incorrect password") {
@@ -115,19 +117,13 @@ function RightPanel() {
     try {
       await googleSignIn();
     } catch (err) {
-     
+
     }
   };
 
-  useEffect(() => {
-    if (user !== null) {
-      navigate("Home");
-    }
-  }, [user]);
-
   return (
     <div style={mainDiv}>
-      
+
       {signUp ? (
         <NewAccount handleNewAccount={handleNewAccount} />
       ) : (
@@ -150,7 +146,7 @@ function RightPanel() {
             {(props) => (
               <Form>
                 <Field
-                  as={TextField}
+                  as={CssTextField}
                   label="Email"
                   name="email"
                   type="email"
@@ -160,7 +156,7 @@ function RightPanel() {
                 />
 
                 <Field
-                  as={TextField}
+                  as={CssTextField}
                   label="Password"
                   name="password"
                   type="password"
